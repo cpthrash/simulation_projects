@@ -4,9 +4,10 @@ set -e
 set -u
 set -o pipefail
 
-#PBS -l mem=1000mb,nodes=1:ppn=1,walltime=72:00:00
+#PBS -l mem=8000mb,nodes=1:ppn=1,walltime=72:00:00
 #PBS -m abe
 #PBS -M pier0273@umn.edu
+#PBS -q lab
 
 # shell script for forward simulations of fluctuating selection in a haploid population with no recombination
 # exploring the dynamics of drift, mutation, and fecundity selection
@@ -20,22 +21,22 @@ set -o pipefail
 # subsequent burn-in periods are 2xPN
 # change subsequent burn-in periods (for iterations >1) using --BURN2 (-b) <burn>
 
-# first sims to be run with no mutation, no selection
+# first sims to be run with no selection to get running
 
 reps=2
 # this section hasn't been updated yet and is from Peter's sims
-# going to try first running sims WITHOUT selection
 # selective coeffiecent, 5, 10, 20, 40%
 # scaled as 2N
 # this is a bash array!
-# selection=(3000 6000 12000 24000) (remove # from this line when ready to implement selection)
+# selection=(3000 6000 12000 24000) (remove # from this line when ready to icdmplement selection)
+selection=3000
 
 # ploidy.  default is diploid, need to use P=1 for haploid population
 ploidy=1
 
 # telling simulation when to end, scaled in PN generations where P=ploidy and N=initial pop size
 # not sure how many generations to run, might need to play around with this parameter a bit and see if/how results change based on diff. sim times
-TE=10,000
+TE=1000
 
 # not sure what getopts is, will leave this section as is for now
 # not currently using getopts, should fix this
@@ -53,24 +54,24 @@ TE=10,000
 module load molpopgen
 
 # create some workspace and move there
-DIRECTORY=~/home/morrellp/pier0273/simulation_projects
+DIRECTORY='/home/morrellp/pier0273/simulation_projects'
 
 # not sure if this is needed since this directory (or a similar one) already exists
 #if [ ! -d "$DIRECTORY" -a -w "$DIRECTORY" ]; then
 #	mkdir $DIRECTORY
 #	mkdir $DIRECTORY/SFS_code
 #	fi
-mkdir $DIRECTORY/SFS_code
-cd $DIRECTORY/SFS_Code/
+# mkdir $DIRECTORY/SFS_code (remove # to implement)
+# cd $DIRECTORY/SFS_Code/ (remove # to implement)
 
 # biologicals
 # theta = mutation rate per site
-theta=0.000 # mutation rate is fixed, varies between 10^-8 - 10^-1
-# recombination rate: no recombination, so set rho=theta*0, will allow for inclusion of recombination in future sims, if desired
-rho=$(echo "$theta * 0" | bc )
-echo $rho
+theta=0.005 # mutation rate is fixed, varies between 10^-8 - 10^-1
+# recombination rate: no recombination, so removed, remove # in future if desired
+# rho=$(echo "$theta * 0" | bc )
+# echo $rho
 # locus length for simulation
-locus_length=3385 # unsure which locus length to use, for now will re-use the locus length from Peter's sims
+# locus_length=3385 # unsure which locus length to use, for now will use default locus length of 5000
 
 # mutation position
 # not sure if need to specify position of mutation, might want to change this?
@@ -93,14 +94,14 @@ pops=1
 pop_size=2000
 
 # number of replicates
-reps=10000
+reps=100
 
 #full path to sfs_code for simulations
 SFS=${HOME}/SFSCode/bin/sfs_code
 #full path to convertSFS_code for transforming simulation output
-convertSFS=${HOME}/SFSCode/bin/convertSFS_CODE
-# Hudson's stats program - summarizing values
-stats=~/Apps/Hudson/msdir/stats
+convertSFS=${HOME}/SFSCode/bin/convertSFS_CODE 
+# Hudson's stats program - summarizing values (remove # from following line when implementing stats)
+stats=${HOME}/MS/stats 
 
 # iterating over the above arrays of the array for selection strength
 # and mutation time
@@ -114,14 +115,23 @@ stats=~/Apps/Hudson/msdir/stats
 seed=$(echo $RANDOM)
 
 # outfile from simulations
-SFS_out=$DIRECTORY/SFS_Code/outfile_sel_${selection}_mut_time_${mut_time}.txt
+SFS_out=${HOME}/SFSCode/outfile_reps_${reps}.txt
+
+#	Make the output file exist
+touch "${SFS_out}"
+
+# MS outfile
+MSStats=${HOME}/SFSCode/msstats_reps_${reps}_out.txt
+
+# make the ms output file exist
+touch "${MSStats}"
 
 # removed (--mutation $mut_time S $mutation G $selection --trackTrajectory S $mutation) b/c not using selection or mutation in first round of simulations
-$SFS $pops $reps --seed $seed --sampSize 50 --theta $theta --rho $rho --length $pops $locus_length --popSize $pop_size --outfile outfile_sel_${selection}_mut_time_${mut_time}.txt -F trajectory_sel_${selection}_mut_time_${mut_time}.txt
-#sleep 30m
+$SFS $pops $reps --ploidy $ploidy --seed $seed --theta $theta --popSize $pop_size --outfile ${HOME}/SFSCode/outfile_reps_${reps}.txt 
+# sleep 30m
 #
-#$convertSFS $SFS_out --ms | msstats >msstats_sel_${selection}_mut_time_${mut_time}_out.txt
+$convertSFS $SFS_out --ms T 2 | ${HOME}/MS/sample_stats > ${HOME}/SFSCode/msstats_reps_${reps}_out.txt
 
-# think i need to disable these (done) on the next 2 lines, as they're part of the for loop?  remove # when need to implement
+# think i need to disable these (done) on the next 2 lines, as they're part of the for loop?  (remove # when need to implement)
 #    done
 # done
