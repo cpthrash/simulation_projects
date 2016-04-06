@@ -74,7 +74,7 @@ theta=0.005 # mutation rate is fixed, varies between 10^-8 - 10^-1
 # locus_length=3385 # unsure which locus length to use, for now will use default locus length of 5000
 
 # mutation position
-# not sure if need to specify position of mutation, might want to change this?
+# not sure if need to specify position of specifc mutation(s), might want to change this?
 # mutation=1607 (remove # if want to implement specific position for mutation)
 
 # mutation time
@@ -84,13 +84,13 @@ theta=0.005 # mutation rate is fixed, varies between 10^-8 - 10^-1
 # don't need specific mutation times, so going to remove this for now 
 # mut_time=(0.00167 0.0167 0.100 0.167 0.300) (remove # if need to implement mut_time parameter)
 
-# minimum frequency and maximum frequency appear to be fir tracking trajectory of a selected mutation, and only print the output when it achieves a particular frequency range
+# minimum frequency and maximum frequency appear to be for tracking trajectory of a selected mutation, and only print the output when it achieves a particular frequency range
 # removing minimum and maximum frequency parameters
 
 # number of populations
 pops=1
 # size of population to simulate
-# population size is fixed, will cary between simulations from 100-10,000.  Other pop sizes to include?
+# population size is fixed, will vary between simulations from 100-10,000.  Other pop sizes to include?
 pop_size=2000
 
 # number of replicates
