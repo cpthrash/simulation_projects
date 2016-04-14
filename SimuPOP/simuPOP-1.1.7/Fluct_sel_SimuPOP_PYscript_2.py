@@ -160,23 +160,7 @@ def simuFluctuatingSelectionWF(PopSize, mutation, generations, step, numChrom, n
         ],
 
         # Pre-mating operators
-        preOps = [SNPMutator(u=mutation, v=mutation)] + [lotsofFitness]
-        # begin evolve function
-            SNPMutator(u=mutation, v=mutation), # "u" specifies Allele 1->allele 2 mutation rate, "v" is opposite
-
-            # Fitness effects (i.e. the environment) change every 500 generations
-            MaSelector(loci=0, fitness=fitness1, begin=0, end=500), 
-            MaSelector(loci=0, fitness=fitness2, begin=500, end=1000),
-            MaSelector(loci=0, fitness=fitness1, begin=1000, end=1500),
-            MaSelector(loci=0, fitness=fitness2, begin=1500, end=2000),
-            MaSelector(loci=0, fitness=fitness1, begin=2000, end=2500),
-            MaSelector(loci=0, fitness=fitness2, begin=2500, end=3000),
-            MaSelector(loci=0, fitness=fitness1, begin=3000, end=3500),
-            MaSelector(loci=0, fitness=fitness2, begin=3500, end=4000),
-            MaSelector(loci=0, fitness=fitness1, begin=4000, end=4500),
-            MaSelector(loci=0, fitness=fitness2, begin=4500, end=5000)
-
-        ],
+        preOps = [SNPMutator(u=mutation, v=mutation)] + lotsofFitness(fitness1, fitness2, begin, end, step, loci),
         matingScheme = RandomMating(),
         postOps = [
             # calculate allele frequencies beginning at the 500th generation and every 500 generations thereafter
