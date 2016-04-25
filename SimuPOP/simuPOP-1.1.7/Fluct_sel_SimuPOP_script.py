@@ -1,5 +1,10 @@
 #!/usr/bin/env python
 
+#PBS -l mem=8000mb,nodes=1:ppn=1,walltime=72:00:00
+#PBS -m abe
+#PBS -M pier0273@umn.edu
+#PBS -q lab
+
 #Author: Colin Pierce
 
 """
@@ -8,8 +13,8 @@ that is undergoing fluctuating selection.  Future iterations of the script will 
 used to uncover allele frequencies using the Moran model of overlapping generations.
 """
 
-import os, sys, types, time 
-import simuOpt 
+import os, sys, types, time # Not used currently 
+import simuOpt # Not used currently
 import simuPOP
 
 #Start SimuPOP program
@@ -22,8 +27,6 @@ Mutation=0.00000005
 
 Generations=5001
 
-Step=(Generations/10) # How frequently are allele frequencies sampled and printed
-
 NumChrom=1 # Number of chromosomes to sample
 
 NumLoci=1  # Number of loci on chromosome(s)
@@ -34,43 +37,49 @@ Fitness1=[1.005, 1]  # Fitness values for each allele in environment 1
 
 Fitness2=[1, 1.005]  # Fitness values for each allele in environment 2
 
-Repetitions=10  # Number of repetitions of the simulation to run
+Divisions=10  # Denominator of Step equation, i.e. # by which generations is divided in order to determine frequency of allle sampling
+
+Step=(Generations/Divisions) # How frequently are allele frequencies sampled and printed
+
+Repetitions=2  # Number of repetitions of the simulation to run
 
 
 # Calculate # generations at which allele frequency will be calculated based on total number of generations
 
 Gen0=0
 
-Gen1=Generations/10
+Gen1=Generations/Divisions
 
-Gen2=(Generations/10)+(Generations/10)
+Gen2=(Generations/Divisions)+(Generations/Divisions)
 
-Gen3=(Generations/10)+Gen2
+Gen3=(Generations/Divisions)+Gen2
 
-Gen4=(Generations/10)+Gen3
+Gen4=(Generations/Divisions)+Gen3
 
-Gen5=(Generations/10)+Gen4
+Gen5=(Generations/Divisions)+Gen4
 
-Gen6=(Generations/10)+Gen5
+Gen6=(Generations/Divisions)+Gen5
 
-Gen7=(Generations/10)+Gen6
+Gen7=(Generations/Divisions)+Gen6
 
-Gen8=(Generations/10)+Gen7
+Gen8=(Generations/Divisions)+Gen7
 
-Gen9=(Generations/10)+Gen8
+Gen9=(Generations/Divisions)+Gen8
 
-Gen10=(Generations/10)+Gen9
+Gen10=(Generations/Divisions)+Gen9
 
 
  
 def simuFluctuatingSelectionWF():
     
-    Count = 1
+    # Start count at 0 for loop
+    Count = 0
 
     # Number of repetitions of the simulation to run
     Reps = Repetitions  
 
-    while Count <= Reps:
+    # Run the loop only when the count is less than the # reps
+    while Count < (Reps):
 
         # initialize Population
         # set population size, loci, ploidy
@@ -87,7 +96,7 @@ def simuFluctuatingSelectionWF():
 
                 # Sets initial allele frequencies
                 simuPOP.InitGenotype(freq=[0.5, 0.5]) 
-                ],
+            ],
 
             # Pre-mating operators
             preOps = [
@@ -119,16 +128,25 @@ def simuFluctuatingSelectionWF():
                 simuPOP.Stat(alleleFreq=0, begin=0, step=Step), 
 
                 # Print allele frequencies, ".3f" refers to floating decimal point with three places, "\n" moves to the next line
+
+                # Print iteration number to screen
+                simuPOP.PyOutput(r"Iteration:" + '\t' + str(Count) + "\t", step=Step),  
+
+                #Might want to calculte second allele frequency as (1-p)
                 simuPOP.PyEval(r"'Generation: %.0f\n' % (gen)", step=Step),
                 simuPOP.PyEval(r"'f(A): %.3f\n' % (alleleFreq[0][0])", step=Step),
                 simuPOP.PyEval(r"'f(a): %.3f\n' % (alleleFreq[0][1])", step=Step),
 
 
-                    ],
+            ],
             
             # program run over set amount of generations
             gen = Generations 
         )
+
+        # Add 1 to Count for next repetition
+        Count = Count + 1
+
 # Run the simulation function!
 simuFluctuatingSelectionWF()
 
