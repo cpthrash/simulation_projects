@@ -25,7 +25,7 @@ PopSize=10000
 
 Mutation=0.00000005
 
-Generations=5001
+Generations=150
 
 NumChrom=1 # Number of chromosomes to sample
 
@@ -33,15 +33,22 @@ NumLoci=1  # Number of loci on chromosome(s)
 
 Ploidy=1  #  Ploidy.  Haploid = 1
 
-Fitness1=[1.005, 1]  # Fitness values for each allele in environment 1
+Fitness=1.001  # Fitness value to be used for fluctuating selection
 
-Fitness2=[1, 1.005]  # Fitness values for each allele in environment 2
+Fitness1=[Fitness, 1]  # Fitness values for each allele in environment 1
 
-Divisions=10  # Denominator of Step equation, i.e. # by which generations is divided in order to determine frequency of allle sampling
+Fitness2=[1, Fitness]  # Fitness values for each allele in environment 2
 
-Step=(Generations/Divisions) # How frequently are allele frequencies sampled and printed
+Divisions=10  # Denominator of Gen equations, i.e. # by which generations is divided in order to determine frequency of environment shift
 
-Repetitions=2  # Number of repetitions of the simulation to run
+SampleDivisions=100 # Denominator of Step equation, i.e. # by which Generations is divided in order to determine how frequently allele frequencies are sampled
+
+Step=(Generations/SampleDivisions) # How frequently are allele frequencies sampled and printed
+
+Repetitions=3  # Number of repetitions of the simulation to run
+
+Filename='-'.join([str(PopSize),str(Generations),str(Fitness)])
+
 
 
 # Calculate # generations at which allele frequency will be calculated based on total number of generations
@@ -128,25 +135,27 @@ def simuFluctuatingSelectionWF():
                 simuPOP.Stat(alleleFreq=0, begin=0, step=Step), 
 
                 # Print allele frequencies, ".3f" refers to floating decimal point with three places, "\n" moves to the next line
-
-                # Print iteration number to screen
-                simuPOP.PyOutput(r"Iteration:" + '\t' + str(Count) + "\t", step=Step),  
-
-                #Might want to calculte second allele frequency as (1-p)
-                simuPOP.PyEval(r"'Generation: %.0f\n' % (gen)", step=Step),
-                simuPOP.PyEval(r"'f(A): %.3f\n' % (alleleFreq[0][0])", step=Step),
-                simuPOP.PyEval(r"'f(a): %.3f\n' % (alleleFreq[0][1])", step=Step),
-
+                simuPOP.PyOutput(r"Iteration:" + '\t' + str(Count) + "\t", step=Step, 
+                    output='>>>%s.txt' % Filename),
+                simuPOP.PyEval(r"'Generation:\t%.0f\t' % (gen)", step=Step, 
+                   output='>>>%s.txt' % Filename),
+                simuPOP.PyEval(r"'%.3f\t' % (alleleFreq[0][0])", step=Step,
+                    output='>>>%s.txt' % Filename),
+                simuPOP.PyEval(r"'%.3f\n' % (1 - (alleleFreq[0][0]))", step=Step,
+                    output='>>>%s.txt' % Filename),
 
             ],
             
-            # program run over set amount of generations
+            # Generations to run
             gen = Generations 
         )
 
-        # Add 1 to Count for next repetition
+        # Add 1 to Count for next repetition/iteration
         Count = Count + 1
+
+        # Open the output file and print to it
+        print(open('%s.txt' % Filename).read())
+
 
 # Run the simulation function!
 simuFluctuatingSelectionWF()
-
