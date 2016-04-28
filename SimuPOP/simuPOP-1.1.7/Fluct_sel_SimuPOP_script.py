@@ -159,3 +159,5 @@ def simuFluctuatingSelectionWF():
 
 # Run the simulation function!
 simuFluctuatingSelectionWF()
+
+print Filename

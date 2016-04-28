@@ -4,17 +4,19 @@
 
 # Start the script
 
-#	Check to see if Rscript is installed. If not, exit with error
-if ! $(command -v Rscript > /dev/null 2> /dev/null); then echo "Please install R and place in your PATH" >&2; exit 1; fi
+
 
 # Call on python script for simuPOP simulation
 python Fluct_sel_SimuPOP_script.py
 
-# Extract the filename (which is a variable), which is printed on the last line of the Python script
-var=`python Fluct_sel_SimuPOP_script.py | tail -n 1`
+# Extract the filename from the python script as a variable, which is printed on the last line of the Python script
+# Need to change this to correct filepath after testing, i.e. 'python Fluct_sel_SimuPOP_script.py'
+Outfile=`python test.py | tail -n 1`
 
-# Define filename for Outfile - Don't think this is correct, likely will need to read about and change
-Outfile=`python Fluct_sel_SimuPOP_script.py | tail -n 1`
+cat $Outfile  # take out later, print var to screen for testing purposes
+
+# Check to see if Rscript is installed. If not, exit with error
+if ! $(command -v Rscript > /dev/null 2> /dev/null); then echo "Please install R and place in your PATH" >&2; exit 1; fi
 
 # Where is plot_MS.R?
 plot_PY.R=/Users/colinpierce/Desktop/plot-PY.R
@@ -36,4 +38,4 @@ Outfile=${HOME}/SFSCode/msstats_reps_${reps}_out.txt
 # Call on the R script
 # Argument 1 from R script
 # Argument 2 from R script
-Rscript "${plot_PY.R}" "${HOME}/SFSCode/msstats_reps_${reps}_out.txt" "${PDF_OUTDIR}/MS_${reps}"
+Rscript "${plot_PY.R}" "${HOME}/Desktop/simulation_projects/${Outfile}.txt" "${PDF_OUTDIR}/${Outfile}"
