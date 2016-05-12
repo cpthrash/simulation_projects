@@ -22,11 +22,11 @@ import random # random module used to generate a random number for when the sele
 
 # List of parameters/options
 
-PopSize=10000
+PopSize=1000
 
 Mutation=0.00000005
 
-Generations=150
+Generations=1500
 
 NumChrom=1 # Number of chromosomes to sample
 
@@ -34,7 +34,9 @@ NumLoci=1  # Number of loci on chromosome(s)
 
 Ploidy=1  #  Ploidy.  Haploid = 1
 
-Fitness=1.001  # Fitness value to be used for fluctuating selection
+selection_value='%04.3f' % random.uniform(1.001, 1.005) 
+
+Fitness=selection_value   # Fitness value to be used for fluctuating selection
 
 Fitness1=[Fitness, 1]  # Fitness values for each allele in environment 1
 
@@ -46,11 +48,12 @@ SampleDivisions=100 # Denominator of Step equation, i.e. # by which Generations 
 
 Step=(Generations/SampleDivisions) # How frequently are allele frequencies sampled and printed
 
-Repetitions=3  # Number of repetitions of the simulation to run
+Repetitions=10  # Number of repetitions of the simulation to run
 
 Filename='-'.join([str(PopSize),str(Generations),str(Fitness)])
 
 
+print selection_value
 
 # Calculate # generations at which allele frequency will be calculated based on total number of generations
 
@@ -112,7 +115,7 @@ def simuFluctuatingSelectionWF():
                 # "u" specifies Allele 1->allele 2 mutation rate, "v" is opposite
                 simuPOP.SNPMutator(u=Mutation, v=Mutation), 
 
-                # Fitness effects (i.e. the environment) change every 500 generations
+                # Fitness effects (i.e. the environment) changes 
                 simuPOP.MaSelector(loci=0, fitness=Fitness1, begin=Gen0, end=Gen1), 
                 simuPOP.MaSelector(loci=0, fitness=Fitness2, begin=Gen1, end=Gen2),
                 simuPOP.MaSelector(loci=0, fitness=Fitness1, begin=Gen2, end=Gen3),
