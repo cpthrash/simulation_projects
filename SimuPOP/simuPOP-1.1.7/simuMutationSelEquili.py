@@ -92,6 +92,8 @@ if __name__ == '__main__':
     if not pars.getParam():
         sys.exit(0)
 
+    print pars
+    
     simuMigration(pars.PopSize, pars.m, pars.generations, pars.step)
     # wait five seconds before exit
 

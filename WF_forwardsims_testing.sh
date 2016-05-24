@@ -107,13 +107,13 @@ convertSFS=${HOME}/SFSCode/bin/convertSFS_CODE
 stats=${HOME}/MS/stats
 
 #	Where is plot_MS.R?
-PLOT_MS=
+PLOT_MS=/Users/colinpierce/Desktop/plot-PY.R
 
 #	If no file exists at PLOT_MS, exit with error
 if [[ ! -f "${PLOT_MS}" ]]; then echo "Failed to find plot_MS.R" >&2; exit 1; fi
 
 #	Where should we put the PDF files?
-PDF_OUTDIR=''
+PDF_OUTDIR='/Users/colinpierce/Desktop/simulation_projects/SimuPOP/simuPOP-1.1.7/PDFs'
 
 #	Make the PDF output directory and any missing parent directories
 mkdir -p "${PDF_OUTDIR}"

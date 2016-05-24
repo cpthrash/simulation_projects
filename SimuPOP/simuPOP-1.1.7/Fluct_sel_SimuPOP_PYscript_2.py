@@ -125,6 +125,9 @@ options = [
     },
 ]
 
+# Output statistics and append to output file.
+ # output = open(outfile, 'a')
+
 # Define a function for fluctuating selection
 def lotsOfFitness(fitness1, fitness2, begin, end, step, loci):
 	selectionList = [] # Making an empty list as a placeholder
@@ -157,6 +160,7 @@ def simuFluctuatingSelectionWF(PopSize, mutation, generations, step, numChrom, n
         # Initial Operators
         initOps = [ 
         InitGenotype(genotype=[0.5, 0.5]) # Sets initial allele frequencies
+        PyExec('traj=[]')  # Initialize variable 'traj' as an empty list
         ],
 
         # Pre-mating operators
@@ -172,8 +176,7 @@ def simuFluctuatingSelectionWF(PopSize, mutation, generations, step, numChrom, n
         gen = generations 
 )
 
-if __name__ == '__main__':
-    # get parameters
+if __name__ == '__main__':  # This is a check 
     par = simuOpt.Params(options, 
       '''This program simulates the evolution of 2 alleles in a fluctuating environment.''', __doc__)
     if not par.getParam():
@@ -212,7 +215,7 @@ if __name__ == '__main__':
 #    numOffspring, numOffMode, dryrun, savePop, os.path.join(name, name + '.pop'))
     
 # Need to figure out how to have output file named based on Pop size, mutation, generations
-print "Done!"
+
 
 
 

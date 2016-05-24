@@ -15,38 +15,12 @@ import random # random module used to generate a random number for when the sele
 
 # List of parameters/options
 
-PopSize=10000
 
-Mutation=0.00000005
-
-Generations=1200
-
-NumChrom=1 # Number of chromosomes to sample
-
-NumLoci=1  # Number of loci on chromosome(s)
-
-Ploidy=1  #  Ploidy.  Haploid = 1
-
-Fitness=1.01  # Fitness value to be used for fluctuating selection
-
-Fitness1=[Fitness, 1]  # Fitness values for each allele in environment 1
-
-Fitness2=[1, Fitness]  # Fitness values for each allele in environment 2
-
-Divisions=10  # Denominator of Gen equations, i.e. # by which generations is divided in order to determine frequency of environment shift
-
-SampleDivisions=100 # Denominator of Step equation, i.e. # by which Generations is divided in order to determine how frequently allele frequencies are sampled
-
-Step=(Generations/SampleDivisions) # How frequently are allele frequencies sampled and printed
-
-Repetitions=3  # Number of repetitions of the simulation to run
-
-Filename='-'.join([str(PopSize),str(Generations),str(Fitness)])
 
 
 
 # Calculate # generations at which allele frequency will be calculated based on total number of generations
-
+'''
 Gen0=0
 
 Gen1=Generations/Divisions
@@ -68,13 +42,14 @@ Gen8=(Generations/Divisions)+Gen7
 Gen9=(Generations/Divisions)+Gen8
 
 Gen10=(Generations/Divisions)+Gen9
+'''
 
 
 # Define a function that creates selection coefficients for fluctuating selection (either symmetrical or drawn randomly) as well as frequency of environmetnal shift and generation number
 def GenerateSelectiveEnv(selcoeff, switches, gens):
     #   Check if selcoeff is a special value that designates random S, generate them
     if selcoeff == 'random':
-        selcoeff = [random.uniform(1, 1.001) for i in range(0, switches)]
+        selcoeff = [random.uniform(1, 1.1) for i in range(0, switches)]
     #   Calculate how many generations will be in each stable period
     stable_period = gens/switches
     #   Create an empty list of selective coefficients, which will be appended with selective coefficient values for each "chunk" of the simulation
@@ -104,14 +79,44 @@ def GenerateSelectiveEnv(selcoeff, switches, gens):
 selective_regime = GenerateSelectiveEnv(selcoeff='random', switches=12, gens=1200)
 
 
-# Input the number of times you want to switch, and selection coefficients
+# Define a simulation function using simuPOP
  
-def simuFluctuatingSelectionWF():
+def simuFluctuatingSelectionWF(PopSize, NumLoci, Ploidy, Mutation, Generations, Step, Repetitions):
     # Start count at 0 for loop
     Count = 0
     # Number of repetitions of the simulation to run
     Reps = Repetitions  
     # Run the loop only when the count is less than the # reps
+    PopSize=10000
+
+    Mutation=0.00000005
+
+    Generations=1200
+
+    NumChrom=1 # Number of chromosomes to sample
+
+    NumLoci=1  # Number of loci on chromosome(s)
+
+    Ploidy=1  #  Ploidy.  Haploid = 1
+
+    Fitness=1.01  # Fitness value to be used for fluctuating selection
+
+    Fitness1=[Fitness, 1]  # Fitness values for each allele in environment 1
+
+    Fitness2=[1, Fitness]  # Fitness values for each allele in environment 2
+
+    Divisions=10  # Denominator of Gen equations, i.e. # by which generations is divided in order to determine frequency of environment shift
+
+    SampleDivisions=100 # Denominator of Step equation, i.e. # by which Generations is divided in order to determine how frequently allele frequencies are sampled
+
+    Step=(Generations/SampleDivisions) # How frequently are allele frequencies sampled and printed
+
+    Repetitions=3  # Number of repetitions of the simulation to run
+
+    Filename='-'.join([str(PopSize),str(Generations)])
+
+    print Filename
+
     while Count < (Reps):
         # initialize Population
         # set population size, loci, ploidy
@@ -154,8 +159,7 @@ def simuFluctuatingSelectionWF():
         # Open the output file and print to it
         print(open('%s.txt' % Filename).read())
 
-
 # Run the simulation function!
-simuFluctuatingSelectionWF()
+simuFluctuatingSelectionWF
 
 print Filename
