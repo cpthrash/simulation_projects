@@ -1,3 +1,9 @@
+#!/usr/bin/env python
+
+#PBS -l mem=8000mb,nodes=1:ppn=1,walltime=72:00:00
+#PBS -m abe
+#PBS -M pier0273@umn.edu
+#PBS -q lab
 
 #Author: Colin Pierce
 
@@ -70,9 +76,7 @@ Gen9=(Generations/Divisions)+Gen8
 
 Gen10=(Generations/Divisions)+Gen9
 
-def GenerateFluctuatingSelection
 
-# Input the number of times you want to switch, and selection coefficients
  
 def simuFluctuatingSelectionWF():
     
@@ -109,7 +113,6 @@ def simuFluctuatingSelectionWF():
                 simuPOP.SNPMutator(u=Mutation, v=Mutation), 
 
                 # Fitness effects (i.e. the environment) change every 500 generations
-                """This section will need to be replaced with the selection function designed with Tom"""
                 simuPOP.MaSelector(loci=0, fitness=Fitness1, begin=Gen0, end=Gen1), 
                 simuPOP.MaSelector(loci=0, fitness=Fitness2, begin=Gen1, end=Gen2),
                 simuPOP.MaSelector(loci=0, fitness=Fitness1, begin=Gen2, end=Gen3),
@@ -120,9 +123,8 @@ def simuFluctuatingSelectionWF():
                 simuPOP.MaSelector(loci=0, fitness=Fitness2, begin=Gen7, end=Gen8),
                 simuPOP.MaSelector(loci=0, fitness=Fitness1, begin=Gen8, end=Gen9),
                 simuPOP.MaSelector(loci=0, fitness=Fitness2, begin=Gen9, end=Gen10)
-                """Replace this section"""
 
-            ] + selective_regime,
+            ],
 
             # # Random selection mating scheme because using haploid population without sex.  Mating parents are randomly selection from the parent population
             matingScheme = simuPOP.RandomSelection(),
