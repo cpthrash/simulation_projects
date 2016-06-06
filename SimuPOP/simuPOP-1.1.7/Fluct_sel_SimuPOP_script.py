@@ -1,10 +1,5 @@
 #!/usr/bin/env python
 
-#PBS -l mem=8000mb,nodes=1:ppn=1,walltime=72:00:00
-#PBS -m abe
-#PBS -M pier0273@umn.edu
-#PBS -q lab
-
 #Author: Colin Pierce
 
 """
