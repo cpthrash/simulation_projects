@@ -1,9 +1,7 @@
 #!/usr/bin/env python
 
-<<<<<<< HEAD
 
 =======
->>>>>>> ab5512714c7b4d7260792e2a56be83a7b68d4b28
 #Author: Colin Pierce
 
 """
