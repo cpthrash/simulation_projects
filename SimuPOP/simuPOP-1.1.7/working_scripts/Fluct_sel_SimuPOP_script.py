@@ -14,69 +14,6 @@ import simuOpt # Not used currently
 import simuPOP
 import random # random module used to generate a random number for when the selection pressure is chosen at random each environmental shift
 
-#Start SimuPOP program
-
-# List of parameters/options
-
-"""
-PopSize=1000
-
-Mutation=0.00000005
-
-Generations=1500
-
-NumChrom=1 # Number of chromosomes to sample
-
-NumLoci=1  # Number of loci on chromosome(s)
-
-Ploidy=1  #  Ploidy.  Haploid = 1
-
-selection_value='%04.3f' % random.uniform(1.001, 1.005) 
-
-Fitness=selection_value   # Fitness value to be used for fluctuating selection
-
-Fitness1=[Fitness, 1]  # Fitness values for each allele in environment 1
-
-Fitness2=[1, Fitness]  # Fitness values for each allele in environment 2
-
-Divisions=10  # Denominator of Gen equations, i.e. # by which generations is divided in order to determine frequency of environment shift
-
-SampleDivisions=100 # Denominator of Step equation, i.e. # by which Generations is divided in order to determine how frequently allele frequencies are sampled
-
-Step=(Generations/SampleDivisions) # How frequently are allele frequencies sampled and printed
-
-Repetitions=10  # Number of repetitions of the simulation to run
-
-Filename='-'.join([str(PopSize),str(Generations),str(Fitness)])
-
-
-print selection_value
-
-# Calculate # generations at which allele frequency will be calculated based on total number of generations
-
-Gen0=0
-
-Gen1=Generations/Divisions
-
-Gen2=(Generations/Divisions)+(Generations/Divisions)
-
-Gen3=(Generations/Divisions)+Gen2
-
-Gen4=(Generations/Divisions)+Gen3
-
-Gen5=(Generations/Divisions)+Gen4
-
-Gen6=(Generations/Divisions)+Gen5
-
-Gen7=(Generations/Divisions)+Gen6
-
-Gen8=(Generations/Divisions)+Gen7
-
-Gen9=(Generations/Divisions)+Gen8
-
-Gen10=(Generations/Divisions)+Gen9
-"""
-
 
 # Define a function that creates selection coefficients for fluctuating selection (either symmetrical or drawn randomly) as well as frequency of environmetnal shift and generation number
 
@@ -217,6 +154,11 @@ def simuFluctuatingSelectionWF(PopSize, Mutation, Generations, NumChrom, NumLoci
         print(open('%s.txt' % Filename).read())
 
         print Filename
+
+# Might want to functionalize this, but is currently working to print random seed to screen
+seed = simuPOP.getRNG().seed()
+#random.seed(seed)
+print(seed)
 
 # Run the simulation function!
 simuFluctuatingSelectionWF(PopSize=1000, Mutation=0.00000005, Generations=1200, NumChrom=1, NumLoci=1, Ploidy=1, Repetitions=3)

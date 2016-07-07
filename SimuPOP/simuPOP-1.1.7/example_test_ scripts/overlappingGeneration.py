@@ -22,7 +22,7 @@ Date: 2008-12-13
 '''
 
 
-from simuPOP import *
+import simuPOP
 
 import random
 
@@ -34,7 +34,7 @@ def simuOverlappingGeneration(size, maxAge, minMatingAge, maxMatingAge, gen):
     maxMatingAge maximal mating age.
     gen          generations to simulate
     '''
-    pop = Population(size, loci=[2], infoFields=['age'])
+    pop = simuPOP.Population(size, loci=[2], infoFields=['age'])
     pop.setIndInfo([random.randint(0, maxAge) for x in range(size)], 'age')
     # define virtual subpopulations
     # age < minMatingAge
@@ -44,26 +44,26 @@ def simuOverlappingGeneration(size, maxAge, minMatingAge, maxMatingAge, gen):
     #
     # Note that we use a cutoff InfoSplitter here, it is also possible to
     # provide a list of values, each corresponding to a virtual subpopulation.
-    pop.setVirtualSplitter(InfoSplitter('age',
+    pop.setVirtualSplitter(simuPOP.InfoSplitter('age',
         cutoff=[minMatingAge, maxMatingAge + 0.1, maxAge + 0.1]))
     #
     pop.evolve(
         initOps = [
-            InitSex(),
-            InitGenotype(freq=[0.5, 0.5])
+            simuPOP.InitSex(),
+            simuPOP.InitGenotype(freq=[0.5, 0.5])
         ],
             # increase age by 1
-        preOps = InfoExec('age += 1'),
-        matingScheme = HeteroMating(
+        preOps = simuPOP.InfoExec('age += 1'),
+        matingScheme = simuPOP.HeteroMating(
             # age <= maxAge, copy to the next generation (weight=-1)
-            [CloneMating(subPops=[(0, x) for x in (0, 1, 2)], weight=-1),
+            [simuPOP.CloneMating(subPops=[(0, x) for x in (0, 1, 2)], weight=-1),
             # random mating for individuals in mating ages
             RandomMating(subPops=[(0, 1)])]),
         postOps = [
             # count the individuals in each virtual subpopulation
-            Stat(popSize=True, subPops=[(0,0), (0,1), (0,2), (0,3)]),
+            simuPOP.Stat(popSize=True, subPops=[(0,0), (0,1), (0,2), (0,3)]),
             # print virtual subpopulation sizes (there is no individual with age > maxAge after mating)
-            PyEval(r"'Size of age groups: %s\n' % (','.join(['%d' % x for x in subPopSize]))")
+            simuPOP.PyEval(r"'Size of age groups: %s\n' % (','.join(['%d' % x for x in subPopSize]))")
         ],
         gen = gen
     )
