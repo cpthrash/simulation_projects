@@ -16,12 +16,36 @@ import random # random module used to generate a random number for when the sele
 import simuPOP.utils
 
 
+#Define parameters to be used in simulation
+params = {
+    'popsize':1000,
+    'gens':1200,
+    'switches':12,
+    'lowerselvalue':0.5,
+    'upperselvalue':1.5
+}
+
+print(params['popsize'])
+
+
+
 # Define a function that creates selection coefficients for fluctuating selection (either symmetrical or drawn randomly) as well as frequency of environmetnal shift and generation number
 
-def GenerateSelectiveEnv(selcoeff, switches, gens, SelectionType, UpperSelValue):
+def GenerateSelectiveEnv(selcoeff, switches, gens, SelectionType, LowerSelValue, UpperSelValue, params):
+    #Check to make sure that params is a dict, raise AssertionError if not
+    try:
+        assert isinstance(params, dict)
+    except AssertionError:
+        raise
+
     #   Check if selcoeff is a special value that designates random S, generate them
     if selcoeff == 'random':
-        selcoeff = [random.uniform(1, UpperSelValue) for i in range(0, switches)]
+        selcoeff = [random.uniform(params['lower'], params['upper']) for i in range(0, params['switches'])]
+        selcoeff = [random.uniform(LowerSelValue, UpperSelValue) for i in range(0, switches)]
+
+    Filename='-'.join([str(PopSize),str(stable_period), str(LowerSelValue), str(UpperSelValue)])
+
+    print Filename
 
     #   Calculate how many generations will be in each stable period
     stable_period = gens/switches
@@ -64,14 +88,14 @@ def GenerateSelectiveEnv(selcoeff, switches, gens, SelectionType, UpperSelValue)
             s = simuPOP.MaSelector(loci=0, fitness=c, begin=breakpoints[j], end=breakpoints[i])
             print c
             sel.append(s)
-    return(sel)
+    return(sel, switches, gens, stable_period, LowerSelValue, UpperSelValue, Filename)
 
 
-# Run the selectime_regime function
+
 # If 'SelectionType' = 'Symmetrical', then (somewhat) symmetrical selection wil be implemented.  Otherwise randomly fluctuating selection (where selection coefficients are chosen at random for both alleles) will be implemented
-# UpperSelValue is the maximum possible selection coefficient.  Can be anything above 1.0, biologically realistic selective coefficients are generally close to 1.0
+# UpperSelValue is the maximum possible selection coefficient.  
 
-selective_regime = GenerateSelectiveEnv(selcoeff='random', switches=12, gens=1200, SelectionType='RandomlyFluctuating', UpperSelValue=1.005)
+selective_regime, switches, gens, stable_period, LowerSelValue, UpperSelValue, Filename = GenerateSelectiveEnv(selcoeff='random', switches=12, gens=200, SelectionType='RandomlyFluctuating', LowerSelValue=0.5, UpperSelValue=1.005)
 
 
 
@@ -100,12 +124,13 @@ def simuFluctuatingSelectionWF(PopSize, Mutation, Generations, NumChrom, NumLoci
 
     Step=(Generations/SampleDivisions) # How frequently are allele frequencies sampled and printed
 
-    Filename='-'.join([str(PopSize),str(Generations)])
+    Filename='-'.join([str(PopSize),str(stable_period), str(LowerSelValue), str(UpperSelValue)])
 
     print Filename
 
-    # Run the loop only when the count is less than the # reps
+    return(Filename)
 
+    # Run the loop only when the count is less than the # reps
     while Count < (Reps):
 
         # initialize Population
@@ -171,16 +196,18 @@ def simuFluctuatingSelectionWF(PopSize, Mutation, Generations, NumChrom, NumLoci
         # Open the output file and print to it
         print(open('%s.txt' % Filename).read())
 
-        print Filename
-
-        # Run the random seed function
+        # Extract and print the random seed
         extractRandomSeed()
 
 
+
+# If 'SelectionType' = 'Symmetrical', then (somewhat) symmetrical selection wil be implemented.  Otherwise randomly fluctuating selection (where selection coefficients are chosen at random for both alleles) will be implemented
+# UpperSelValue is the maximum possible selection coefficient.  Can be anything above 1.0, biologically realistic selective coefficients are generally close to 1.0
+
+selective_regime, switches, gens, stable_period, LowerSelValue, UpperSelValue = GenerateSelectiveEnv(selcoeff='random', switches=12, gens=200, SelectionType='RandomlyFluctuating', LowerSelValue=0.5, UpperSelValue=1.005)
+
+
 # Run the simulation function!
-simuFluctuatingSelectionWF(PopSize=200, Mutation=0.000005, Generations=100, NumChrom=1, NumLoci=50, Ploidy=1, Repetitions=10)
+simuFluctuatingSelectionWF(PopSize=100, Mutation=0.000005, Generations=200, NumChrom=1, NumLoci=50, Ploidy=1, Repetitions=10)
 
-
-
-
-#print Filename
+print Filename

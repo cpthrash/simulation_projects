@@ -13,38 +13,72 @@ import os, sys, types, time # Not used currently
 import simuOpt # Not used currently
 import simuPOP
 import random # random module used to generate a random number for when the selection pressure is chosen at random each environmental shift
+import simuPOP.utils
 
+
+#Define parameters in a dictionary to be used in simulation
+params = {
+    'PopSize':1000,
+    'Generations':1200,
+    'Mutation':.0000005,
+    'NumChrom':1,
+    'NumLoci':50,
+    'Ploidy':1,
+    'Repetitions':3,
+    'Switches':2,
+    'LowerSelValue':1.0,  # Lower limit of selection coefficients
+    'UpperSelValue':2.0,  # Upper limit of seleciton coefficients
+    'Selcoeff':'random',
+    'SelectionType':'RandomlyFluctuating', # 'Symmetrical'' for semi-symmetrical selection pressure.  'RandomlyFluctuating' for random selection pressure drawn from distribution
+    'SampleDivisions':12,
+    
+}
+
+# Define other parameters that require 'params' for calculation of value
+other_params = {
+    'Step':((params['Generations'])/(params['SampleDivisions']))
+
+}
 
 # Define a function that creates selection coefficients for fluctuating selection (either symmetrical or drawn randomly) as well as frequency of environmetnal shift and generation number
 
-def GenerateSelectiveEnv(selcoeff, switches, gens, SelectionType, UpperSelValue):
+def GenerateSelectiveEnv(params):
+    #Check to make sure that params and other_params are dicts, raise AssertionError if not
+    try:
+        assert isinstance(params, dict)
+        assert isinstance(other_params, dict)
+    except AssertionError:
+        raise
+
     #   Check if selcoeff is a special value that designates random S, generate them
-    if selcoeff == 'random':
-        selcoeff = [random.uniform(1, UpperSelValue) for i in range(0, switches)]
+    if params['Selcoeff'] == 'random':
+        Sel_coeff = [random.uniform(params['LowerSelValue'], params['UpperSelValue']) for i in range(0, params['Switches'])]
 
     #   Calculate how many generations will be in each stable period
-    stable_period = gens/switches
+    stable_period = (params['Generations']/params['Switches'])
+
+    print stable_period
 
     #   Create an empty list of selective coefficients, which will be appended with selective coefficient values for each "chunk" of the simulation
     coeffs = []
-    while len(coeffs) < switches:
-        for s in selcoeff: 
+    while len(coeffs) < params['Switches']:
+        for s in Sel_coeff: 
             coeffs.append(s) 
     print(coeffs)
 
     #   Generate a list of actual generation numbers where the selective coefficient changes
     #   X%Y is x modulus y; x divided by y, return the remainder
-    breakpoints = [i for i in range(0, gens+1) if i%stable_period == 0]  # for every value i in the range (0-gens+1), if i/stable period returns a remainder of 0,
+    breakpoints = [i for i in range(0, params['Generations']+1) if i%stable_period == 0]  # for every value i in the range (0-gens+1), if i/stable period returns a remainder of 0,
 
     # Generate a list of random numbers in the desired range if implementing randomly fluctuating selection
-    listselcoeff = [random.uniform(1, UpperSelValue) for i in range(0, 100000)] # Generates a list of values between 1-1.005
+    listselcoeff = [random.uniform(params['LowerSelValue'], params['UpperSelValue']) for i in range(0, 100000)] # Generates a list of values between 1-1.005
 
     #   Associate a selective coefficient with a start and end period
     sel = [] # Create an empty list that will contain appended selection coefficient values
 
     # If selection type is defined as 'Symmetrical', implement semi-symmetrical selection.  Otherwise, implement randomly fluctuating selection.
 
-    if SelectionType == 'Symmetrical':
+    if params['SelectionType'] == 'Symmetrical':
         for i in range(1, len(breakpoints)): # for every value i in the range (1-(the length of the breakpoints set))
             j = i-1
             if i % 2 == 1:
@@ -63,45 +97,40 @@ def GenerateSelectiveEnv(selcoeff, switches, gens, SelectionType, UpperSelValue)
             s = simuPOP.MaSelector(loci=0, fitness=c, begin=breakpoints[j], end=breakpoints[i])
             print c
             sel.append(s)
-    return(sel)
+    return(sel, stable_period)
 
 
-# Run the selectime_regime function
-# If 'SelectionType' = 'Symmetrical', then (somewhat) symmetrical selection wil be implemented.  Otherwise randomly fluctuating selection (where selection coefficients are chosen at random for both alleles) will be implemented
-# UpperSelValue is the maximum possible selection coefficient.  Can be anything above 1.0, biologically realistic selective coefficients are generally close to 1.0
 
-selective_regime = GenerateSelectiveEnv(selcoeff='random', switches=12, gens=1200, SelectionType='RandomlyFluctuating', UpperSelValue=1.005)
+selective_regime, stable_period = GenerateSelectiveEnv(params)
+
+Filename = '-'.join([str(params['PopSize']), str(stable_period), str(params['LowerSelValue']), str(params['UpperSelValue'])])
 
 
-# Define a simulation function using simuPOP
- 
-def simuFluctuatingSelectionWF(PopSize, Mutation, Generations, NumChrom, NumLoci, Ploidy, Repetitions):
-    
+
+def extractRandomSeed(): # Define a function to print the random seed for the simulation
+    seed = simuPOP.getRNG().seed()
+    #random.seed(seed)
+    print(seed)
+
+
+def simuFluctuatingSelectionWF(params, other_params): # Define a simulation function using simuPOP
+    #Check to make sure that params and other_params are dicts, raise AssertionError if not
+    try:
+        assert isinstance(params, dict)
+        assert isinstance(other_params, dict)
+    except AssertionError:
+        raise
+
     # Start count at 0 for loop
     Count = 0
 
-    # Number of repetitions of the simulation to run
-    Reps = Repetitions  
-
-    # Divisions=10  # Denominator of Gen equations, i.e. # by which generations is divided in order to determine frequency of environment shift
-
-    #Repetitions=3  # Number of repetitions of the simulation to run
-
-    SampleDivisions=100 # Denominator of Step equation, i.e. # by which Generations is divided in order to determine how frequently allele frequencies are sampled
-
-    Step=(Generations/SampleDivisions) # How frequently are allele frequencies sampled and printed
-
-    Filename='-'.join([str(PopSize),str(Generations)])
-
-    print Filename
 
     # Run the loop only when the count is less than the # reps
-
-    while Count < (Reps):
+    while Count < (params['Repetitions']):
 
         # initialize Population
         # set population size, loci, ploidy
-        pop = simuPOP.Population(size=PopSize, loci=NumLoci, ploidy=Ploidy, 
+        pop = simuPOP.Population(size=params['PopSize'], loci=params['NumLoci'], ploidy=params['Ploidy'], 
 
             # create fields where allele frequency and fitness values can be stored
             infoFields=['alleleFreq', 'fitness'])
@@ -120,47 +149,51 @@ def simuFluctuatingSelectionWF(PopSize, Mutation, Generations, NumChrom, NumLoci
             preOps = [
 
                 # "u" specifies Allele 1->allele 2 mutation rate, "v" is opposite
-                simuPOP.SNPMutator(u=Mutation, v=Mutation)] + selective_regime,
+                simuPOP.SNPMutator(u=params['Mutation'], v=params['Mutation'])] + selective_regime,
 
             # # Random selection mating scheme because using haploid population without sex.  Mating parents are randomly selection from the parent population
             matingScheme = simuPOP.RandomSelection(),
 
-            # Post mating operators
-            postOps = [
+            # Post mating operators - only use when need to calculate and print allele frequencies
 
-                # calculate allele frequencies beginning at the (Generations/10)th generation and every (Generations/10)th generations thereafter
-                simuPOP.Stat(alleleFreq=0, begin=0, step=Step), 
+           # postOps = [
+
+            
+                # calculate allele frequencies 
+               # simuPOP.Stat(alleleFreq=0, begin=0, step=other_params['Step']), 
 
                 # Print allele frequencies, ".3f" refers to floating decimal point with three places, "\n" moves to the next line, \t adds a tab so that the file is tab delimited and easily readable in R
-                simuPOP.PyOutput(r"Iteration:" + '\t' + str(Count) + "\t", step=Step, 
-                    output='>>>%s.txt' % Filename),
-                simuPOP.PyEval(r"'Generation:\t%.0f\t' % (gen)", step=Step, 
-                   output='>>>%s.txt' % Filename),
-                simuPOP.PyEval(r"'%.3f\t' % (alleleFreq[0][0])", step=Step,
-                    output='>>>%s.txt' % Filename),
-                simuPOP.PyEval(r"'%.3f\n' % (1 - (alleleFreq[0][0]))", step=Step,
-                    output='>>>%s.txt' % Filename),
-
-            ],
+                #simuPOP.PyOutput(r"Iteration:" + '\t' + str(Count) + "\t", step=other_params['Step'], 
+                #    output='>>%s.txt' % Filename),
+                #simuPOP.PyEval(r"'Generation:\t%.0f\t' % (gen)", step=other_params['Step'], 
+                #    output='>>%s.txt' % Filename),
+                #simuPOP.PyEval(r"'%.3f\t' % (alleleFreq[0][0])", step=other_params['Step'],
+                #    output='>>%s.txt' % Filename),
+                #simuPOP.PyEval(r"'%.3f\n' % (1 - (alleleFreq[0][0]))", step=other_params['Step'],
+                #    output='>>%s.txt' % Filename)
             
+           # ,
+           # ],
+
+          
             # Generations to run
-            gen = Generations 
+            gen =params['Generations']
         )
 
         # Add 1 to Count for next repetition/iteration
         Count = Count + 1
 
-        # Open the output file and print to it
-        print(open('%s.txt' % Filename).read())
+        simuPOP.utils.export(pop, format='ms', output=('MS-%s.txt' % Filename), gui=False) # Export the data in MS format
 
-        print Filename
+        print(open('MS-%s.txt' % Filename).read())  # 
+        
+        #print(open('%s.txt' % Filename).read())  # Open the output file and print to it
 
-# Might want to functionalize this, but is currently working to print random seed to screen
-seed = simuPOP.getRNG().seed()
-#random.seed(seed)
-print(seed)
+        # Extract and print the random seed
+        extractRandomSeed()
+
 
 # Run the simulation function!
-simuFluctuatingSelectionWF(PopSize=1000, Mutation=0.00000005, Generations=1200, NumChrom=1, NumLoci=1, Ploidy=1, Repetitions=3)
+simuFluctuatingSelectionWF(params, other_params)
 
-#print Filename
+print('MS-%s.txt' % Filename)

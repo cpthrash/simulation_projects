@@ -3,17 +3,17 @@
 # Enable command-line arguments
 args <- commandArgs(trailingOnly = TRUE)
 
-simuPOP.file <- args[1] # Get the name of the simuPOP output file
+MSstats.file <- args[1] # Get the name of the MSstats file
 outfile.name <- args[2] # Get the name of the R output file, i.e. the name of the PDF to be printed
 
 # Read in file
-simuPOP.data <- read.table(file = simuPOP.file,
+MSstats.data <- read.table(file = MSstats.file,
                       sep = "\t", # Separate columns by tab 
                       header = FALSE, # Don't include header
                       as.is = TRUE,) # No factors!
 
 # Set the names of our dataframe
-names(x = simuPOP.data) <- c("Pi", "Pi.values", "SS", "SS.values", "TajD", "TajD.values", "thetaH", "thetaH.values", "H", "Het?")
+names(x = MSstats.data) <- c("Pi", "Pi.values", "SS", "SS.values", "TajD", "TajD.values", "thetaH", "thetaH.values", "H", "Het?")
 
 # Start the PDF printer
 pdf(file = paste0(outfile.name, ".pdf"), width = 6, height = 6)
