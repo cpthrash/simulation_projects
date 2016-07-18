@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 
 #Author: Colin Pierce
 
@@ -18,7 +16,7 @@ import simuPOP.utils
 
 #Define parameters in a dictionary to be used in simulation
 params = {
-    'PopSize':1000,
+    'PopSize':3001,
     'Generations':1200,
     'Mutation':.0000005,
     'NumChrom':1,
@@ -122,75 +120,75 @@ def simuFluctuatingSelectionWF(params, other_params): # Define a simulation func
         raise
 
     # Start count at 0 for loop
-    Count = 0
+    #Count = 0
 
 
     # Run the loop only when the count is less than the # reps
-    while Count < (params['Repetitions']):
+    #while Count < (params['Repetitions']):
 
         # initialize Population
         # set population size, loci, ploidy
-        pop = simuPOP.Population(size=params['PopSize'], loci=params['NumLoci'], ploidy=params['Ploidy'], 
+    pop = simuPOP.Population(size=(params['PopSize'], params['PopSize'], params['PopSize']), loci=params['NumLoci'], ploidy=params['Ploidy'], 
 
-            # create fields where allele frequency and fitness values can be stored
-            infoFields=['alleleFreq', 'fitness'])
-            
-        # Evolve the population!
-        pop.evolve(
-
-            # Initial Operators
-            initOps = [ 
-
-                # Sets initial allele frequencies
-                simuPOP.InitGenotype(freq=[0.5, 0.5]) 
-            ],
-
-            # Pre-mating operators
-            preOps = [
-
-                # "u" specifies Allele 1->allele 2 mutation rate, "v" is opposite
-                simuPOP.SNPMutator(u=params['Mutation'], v=params['Mutation'])] + selective_regime,
-
-            # # Random selection mating scheme because using haploid population without sex.  Mating parents are randomly selection from the parent population
-            matingScheme = simuPOP.RandomSelection(),
-
-            # Post mating operators - only use when need to calculate and print allele frequencies
-
-           # postOps = [
-
-            
-                # calculate allele frequencies 
-               # simuPOP.Stat(alleleFreq=0, begin=0, step=other_params['Step']), 
-
-                # Print allele frequencies, ".3f" refers to floating decimal point with three places, "\n" moves to the next line, \t adds a tab so that the file is tab delimited and easily readable in R
-                #simuPOP.PyOutput(r"Iteration:" + '\t' + str(Count) + "\t", step=other_params['Step'], 
-                #    output='>>%s.txt' % Filename),
-                #simuPOP.PyEval(r"'Generation:\t%.0f\t' % (gen)", step=other_params['Step'], 
-                #    output='>>%s.txt' % Filename),
-                #simuPOP.PyEval(r"'%.3f\t' % (alleleFreq[0][0])", step=other_params['Step'],
-                #    output='>>%s.txt' % Filename),
-                #simuPOP.PyEval(r"'%.3f\n' % (1 - (alleleFreq[0][0]))", step=other_params['Step'],
-                #    output='>>%s.txt' % Filename)
-            
-           # ,
-           # ],
-
-          
-            # Generations to run
-            gen =params['Generations']
-        )
-
-        # Add 1 to Count for next repetition/iteration
-        Count = Count + 1
-
-        simuPOP.utils.export(pop, format='ms', output=('MS-%s.txt' % Filename), gui=False) # Export the data in MS format
-
-        print(open('MS-%s.txt' % Filename).read())  # 
+        # create fields where allele frequency and fitness values can be stored
+        infoFields=['alleleFreq', 'fitness'])
         
-        #print(open('%s.txt' % Filename).read())  # Open the output file and print to it
+    # Evolve the population!
+    pop.evolve(
 
-        # Extract and print the random seed
-        extractRandomSeed()
+        # Initial Operators
+        initOps = [ 
+
+            # Sets initial allele frequencies
+            simuPOP.InitGenotype(freq=[0.5, 0.5]) 
+        ],
+
+        # Pre-mating operators
+        preOps = [
+
+            # "u" specifies Allele 1->allele 2 mutation rate, "v" is opposite
+            simuPOP.SNPMutator(u=params['Mutation'], v=params['Mutation'])] + selective_regime,
+
+        # # Random selection mating scheme because using haploid population without sex.  Mating parents are randomly selection from the parent population
+        matingScheme = simuPOP.RandomSelection(),
+
+        # Post mating operators - only use when need to calculate and print allele frequencies
+
+        # postOps = [
+
+        
+            # calculate allele frequencies 
+            # simuPOP.Stat(alleleFreq=0, begin=0, step=other_params['Step']), 
+
+            # Print allele frequencies, ".3f" refers to floating decimal point with three places, "\n" moves to the next line, \t adds a tab so that the file is tab delimited and easily readable in R
+            #simuPOP.PyOutput(r"Iteration:" + '\t' + str(Count) + "\t", step=other_params['Step'], 
+            #    output='>>%s.txt' % Filename),
+            #simuPOP.PyEval(r"'Generation:\t%.0f\t' % (gen)", step=other_params['Step'], 
+            #    output='>>%s.txt' % Filename),
+            #simuPOP.PyEval(r"'%.3f\t' % (alleleFreq[0][0])", step=other_params['Step'],
+            #    output='>>%s.txt' % Filename),
+            #simuPOP.PyEval(r"'%.3f\n' % (1 - (alleleFreq[0][0]))", step=other_params['Step'],
+            #    output='>>%s.txt' % Filename)
+        
+        # ,
+        # ],
+
+        
+        # Generations to run
+        gen =params['Generations']
+    )
+
+    # Add 1 to Count for next repetition/iteration
+    #Count = Count + 1
+
+    simuPOP.utils.export(pop, format='ms', output=('MS-%s.txt' % Filename), gui=False, splitBy='subPop') # Export the data in MS format
+
+    print(open('MS-%s.txt' % Filename).read())  # 
+    
+    #print(open('%s.txt' % Filename).read())  # Open the output file and print to it
+
+    # Extract and print the random seed
+    extractRandomSeed()
 
 
 # Run the simulation function!

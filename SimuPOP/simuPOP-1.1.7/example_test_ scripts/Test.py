@@ -135,7 +135,7 @@ def simuFluctuatingSelectionWF(PopSize, Mutation, Generations, NumChrom, NumLoci
 
         # initialize Population
         # set population size, loci, ploidy
-        pop = simuPOP.Population(size=PopSize, loci=NumLoci, ploidy=Ploidy, 
+        pop = simuPOP.Population(size=[PopSize, PopSize], loci=NumLoci, ploidy=Ploidy, 
 
             # create fields where allele frequency and fitness values can be stored
             infoFields=['alleleFreq', 'fitness'])
@@ -184,12 +184,14 @@ def simuFluctuatingSelectionWF(PopSize, Mutation, Generations, NumChrom, NumLoci
         Count = Count + 1
 
 
-        simuPOP.utils.export(pop, format='ms', output='ms.txt', gui=False)
+        simuPOP.utils.export(pop, format='ms', output='ms.txt', gui=False, splitBy='subPop')
         # export first chromosome, subpops as replicates
         #export(pop, format='ms', output='ms_subPop.txt', splitBy='subPop')
         # export all chromosomes, but limit to all males in subPop 1
         #pop.setVirtualSplitter(sim.SexSplitter())
         #export(pop, format='ms', output='ms_chrom.txt', splitBy='chrom', subPops=[(1,0)])
+
+
 
         print(open('ms.txt').read())
         
