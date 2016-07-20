@@ -11,35 +11,43 @@ import os, sys, types, time # Not used currently
 import simuOpt # Not used currently
 import simuPOP
 import random # random module used to generate a random number for when the selection pressure is chosen at random each environmental shift
-import simuPOP.utils
+import simuPOP.utils # Contains export function for exporting in MS format
 
 
 #Define parameters in a dictionary to be used in simulation
 params = {
-    'PopSize':3001,
-    'Generations':1200,
-    'Mutation':.0000005,
+    'PopSize':52,
+    'Generations':1000,
+    'Mutation':.001,
     'NumChrom':1,
-    'NumLoci':50,
+    'NumLoci':1,
     'Ploidy':1,
     'Repetitions':3,
-    'Switches':2,
-    'LowerSelValue':1.0,  # Lower limit of selection coefficients
-    'UpperSelValue':2.0,  # Upper limit of seleciton coefficients
-    'Selcoeff':'random',
+    'Switches':500,
+    'LowerSelValue':2.0,  # Lower limit of selection coefficients
+    'UpperSelValue':1.0,  # Upper limit of seleciton coefficients
+    'Selcoeff':'random',  # If 'random', selection coefficients will be drawn randomly from a uniform distribution
     'SelectionType':'RandomlyFluctuating', # 'Symmetrical'' for semi-symmetrical selection pressure.  'RandomlyFluctuating' for random selection pressure drawn from distribution
     'SampleDivisions':12,
+    'PopList':[] # Create an empty list 
     
 }
 
 # Define other parameters that require 'params' for calculation of value
 other_params = {
     'Step':((params['Generations'])/(params['SampleDivisions']))
-
 }
 
-# Define a function that creates selection coefficients for fluctuating selection (either symmetrical or drawn randomly) as well as frequency of environmetnal shift and generation number
+# Create a list of populations that functions as the number of replicates/iterations of the simulation
+for i in range(params['Repetitions']):
+    params['PopList'].append(params['PopSize'])
 
+# Chech to make sure # generations is not less than # of environmental shifts
+if (params["Switches"]) > (params["Generations"]):
+   raise SystemExit('Generations must be greater than switches')
+
+
+# Define a function that creates selection coefficients for fluctuating selection (either symmetrical or drawn randomly) as well as frequency of environmetnal shift and generation number
 def GenerateSelectiveEnv(params):
     #Check to make sure that params and other_params are dicts, raise AssertionError if not
     try:
@@ -98,17 +106,22 @@ def GenerateSelectiveEnv(params):
     return(sel, stable_period)
 
 
-
+# Run the selective regime function
 selective_regime, stable_period = GenerateSelectiveEnv(params)
 
-Filename = '-'.join([str(params['PopSize']), str(stable_period), str(params['LowerSelValue']), str(params['UpperSelValue'])])
-
+# Define the filename for priting
+Filename = '-'.join([str(params['PopSize']), str(params['Generations']), str(stable_period), str(params['LowerSelValue']), str(params['UpperSelValue'])])
 
 
 def extractRandomSeed(): # Define a function to print the random seed for the simulation
     seed = simuPOP.getRNG().seed()
     #random.seed(seed)
-    print(seed)
+    return(seed)
+
+# Print the random seed from the simulation to the 'storeSeed.txt' file
+with open('storeSeed.txt', 'a') as file:
+    file.write('\n%r\n%r' % (Filename, extractRandomSeed()))
+    file.close()
 
 
 def simuFluctuatingSelectionWF(params, other_params): # Define a simulation function using simuPOP
@@ -119,16 +132,8 @@ def simuFluctuatingSelectionWF(params, other_params): # Define a simulation func
     except AssertionError:
         raise
 
-    # Start count at 0 for loop
-    #Count = 0
-
-
-    # Run the loop only when the count is less than the # reps
-    #while Count < (params['Repetitions']):
-
-        # initialize Population
-        # set population size, loci, ploidy
-    pop = simuPOP.Population(size=(params['PopSize'], params['PopSize'], params['PopSize']), loci=params['NumLoci'], ploidy=params['Ploidy'], 
+    
+    pop = simuPOP.Population(size=tuple(params['PopList']), loci=params['NumLoci'], ploidy=params['Ploidy'], # 'tuple(params['PopList']' inserts the number of populations that serves as the number of replicates/iterations, which is defined in the params dict
 
         # create fields where allele frequency and fitness values can be stored
         infoFields=['alleleFreq', 'fitness'])
@@ -149,7 +154,7 @@ def simuFluctuatingSelectionWF(params, other_params): # Define a simulation func
             # "u" specifies Allele 1->allele 2 mutation rate, "v" is opposite
             simuPOP.SNPMutator(u=params['Mutation'], v=params['Mutation'])] + selective_regime,
 
-        # # Random selection mating scheme because using haploid population without sex.  Mating parents are randomly selection from the parent population
+        # # Random selection mating scheme because using haploid population without sex. Parents are randomly selected from the parent population to give birth
         matingScheme = simuPOP.RandomSelection(),
 
         # Post mating operators - only use when need to calculate and print allele frequencies
@@ -178,8 +183,6 @@ def simuFluctuatingSelectionWF(params, other_params): # Define a simulation func
         gen =params['Generations']
     )
 
-    # Add 1 to Count for next repetition/iteration
-    #Count = Count + 1
 
     simuPOP.utils.export(pop, format='ms', output=('MS-%s.txt' % Filename), gui=False, splitBy='subPop') # Export the data in MS format
 

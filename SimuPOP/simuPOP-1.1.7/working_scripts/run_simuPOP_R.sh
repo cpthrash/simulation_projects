@@ -13,31 +13,32 @@ python Fluct_sel_SimuPOP_script.py
 var=`python Fluct_sel_SimuPOP_script.py | tail -n 1`
 
 # Where is outfile from simulation? 
-# Need to update
 simOutfile=`python Fluct_sel_SimuPOP_script.py | tail -n 1`
 
-base=$(basename "${simOutfile}" .txt) # Strip the path information from the filename, printing only the file name
+base=$(basename "${simOutfile}" .txt) # Strip the path information from the filename
 
-popSize=$(echo "${base}" | cut -f 2 -d '-')
+popSize=$(echo "${base}" | cut -f 2 -d '-')  # Extract the population size from the filename
 
-generations=$(echo "${base}" | cut -f 3 -d '-')
+generations=$(echo "${base}" | cut -f 3 -d '-')  # Extract the generations from the filename
 
-lowerSelValue=$(echo "${base}" | cut -f 4 -d '-')
+stablePeriod=$(echo "${base}" | cut -f 4 -d '-')  # Extract the stablePeriod from the filename
 
-upperSelValue=$(echo "${base}" | cut -f 5 -d '-')
+lowerSelValue=$(echo "${base}" | cut -f 5 -d '-') # Extract the lower selection value from the filename
+
+upperSelValue=$(echo "${base}" | cut -f 6 -d '-')  # Extract the upper selection value from the filename
 
 # Take simOutfile and calculate summary statistics using msstats
-cat "${simOutfile}" | msstats > MSstats_popSize_${popSize}_generations_${generations}_lowerSelValue_${lowerSelValue}_upperSelValue__${upperSelValue}_out.txt
+cat "${simOutfile}" | msstats > MSstats_${popSize}_${generations}_${stablePeriod}_${lowerSelValue}_${upperSelValue}.txt
 
 # Where is MSstats_outfile? (file containing summary statistics from MSstats)?
-MSstats_outfile=MSstats_popSize_${popSize}_generations_${generations}_lowerSelValue_${lowerSelValue}_upperSelValue__${upperSelValue}_out.txt
+MSstats_outfile=MSstats_${popSize}_${generations}_${stablePeriod}_${lowerSelValue}_${upperSelValue}.txt
 
 
 # If no file exists at MSstats, exit with error
 if [[ ! -f "${MSstats_outfile}" ]]; then echo "Failed to find MSstats_outfile" >&2; exit 1; fi
 
 #	Where should we put the PDF files that are printed from the Rscript?
-PDF_OUTDIR='${HOME}/simulation_projects_MSI/PDFs/PDFs'
+PDF_OUTDIR='PDFs'
 
 
 #	Make the PDF output directory and any missing parent directories
@@ -51,5 +52,5 @@ if ! $(command -v Rscript > /dev/null 2> /dev/null); then echo "Please install R
 
 # Call on the R script of filename 'plot_MSstats.R'
 # Pass argument 1 to the Rscript, which is the location of the MSstats_outfile
-# Pass argument 2 to the Rscript
-Rscript "${graph_summary_statistics}" "${MSstats_outfile}" "${PDF_OUTDIR}/PDF_popSize_${popSize}_generations_${generations}_lowerSelValue_${lowerSelValue}_upperSelValue__${upperSelValue}}"
+# Pass argument 2 to the Rscript, which is the name of the PDF outfile
+Rscript "${graph_summary_statistics}" "${MSstats_outfile}" "${PDF_OUTDIR}/PDF_${popSize}_${generations}_${stablePeriod}_${lowerSelValue}_${upperSelValue}"
