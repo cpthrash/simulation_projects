@@ -16,19 +16,19 @@ import simuPOP.utils # Contains export function for exporting in MS format
 
 #Define parameters in a dictionary to be used in simulation
 params = {
-    'PopSize':52,
-    'Generations':1000,
+    'PopSize':500,
+    'Generations':10000,
     'Mutation':.001,
     'NumChrom':1,
     'NumLoci':1,
     'Ploidy':1,
     'Repetitions':3,
-    'Switches':500,
-    'LowerSelValue':2.0,  # Lower limit of selection coefficients
-    'UpperSelValue':1.0,  # Upper limit of seleciton coefficients
+    'Switches':1000,
+    'LowerSelValue':1.0,  # Lower limit of selection coefficients
+    'UpperSelValue':2.0,  # Upper limit of seleciton coefficients
     'Selcoeff':'random',  # If 'random', selection coefficients will be drawn randomly from a uniform distribution
     'SelectionType':'RandomlyFluctuating', # 'Symmetrical'' for semi-symmetrical selection pressure.  'RandomlyFluctuating' for random selection pressure drawn from distribution
-    'SampleDivisions':12,
+    'SampleDivisions':5000,
     'PopList':[] # Create an empty list 
     
 }
