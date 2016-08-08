@@ -16,31 +16,31 @@ import simuPOP.utils # Contains export function for exporting in MS format
 
 #Define parameters in a dictionary to be used in simulation
 params = {
-    'PopSize':500,
-    'Generations':10000,
+    'PopSize':100,
+    'Generations':100,
     'Mutation':.001,
     'NumChrom':1,
     'NumLoci':1,
     'Ploidy':1,
-    'Repetitions':3,
-    'Switches':1000,
+    'Repetitions':10,
+    'Switches':50,
     'LowerSelValue':1.0,  # Lower limit of selection coefficients
-    'UpperSelValue':2.0,  # Upper limit of seleciton coefficients
+    'UpperSelValue':1.05,  # Upper limit of seleciton coefficients
     'Selcoeff':'random',  # If 'random', selection coefficients will be drawn randomly from a uniform distribution
     'SelectionType':'RandomlyFluctuating', # 'Symmetrical'' for semi-symmetrical selection pressure.  'RandomlyFluctuating' for random selection pressure drawn from distribution
-    'SampleDivisions':5000,
+    'SampleDivisions':100,
     'PopList':[] # Create an empty list 
     
 }
 
-# Define other parameters that require 'params' for calculation of value
+# Define other parameters in a dictionary that require 'params' for calculation of value
 other_params = {
     'Step':((params['Generations'])/(params['SampleDivisions']))
 }
 
 # Create a list of populations that functions as the number of replicates/iterations of the simulation
-for i in range(params['Repetitions']):
-    params['PopList'].append(params['PopSize'])
+for i in range(params['Repetitions']): # For the number of repetitions listed in the 'params' dict,
+    params['PopList'].append(params['PopSize']) # Append the PopSize into the 'PopList' into the 'params' dict, thus creating a list of populations of the specified size which function as repetitions/iterations
 
 # Chech to make sure # generations is not less than # of environmental shifts
 if (params["Switches"]) > (params["Generations"]):
@@ -109,8 +109,12 @@ def GenerateSelectiveEnv(params):
 # Run the selective regime function
 selective_regime, stable_period = GenerateSelectiveEnv(params)
 
-# Define the filename for priting
+# Define the filename for printing the MSoutput
 Filename = '-'.join([str(params['PopSize']), str(params['Generations']), str(stable_period), str(params['LowerSelValue']), str(params['UpperSelValue'])])
+
+
+# Define filename for printing allele frequency trajectory
+Allele_Freq_Filename = '-'.join([str('AlleleFreqTraj'), str(params['PopSize']), str(params['Generations']), str(stable_period), str(params['LowerSelValue']), str(params['UpperSelValue'])])
 
 
 def extractRandomSeed(): # Define a function to print the random seed for the simulation
@@ -159,24 +163,27 @@ def simuFluctuatingSelectionWF(params, other_params): # Define a simulation func
 
         # Post mating operators - only use when need to calculate and print allele frequencies
 
-        # postOps = [
+        postOps = [
 
         
             # calculate allele frequencies 
-            # simuPOP.Stat(alleleFreq=0, begin=0, step=other_params['Step']), 
+            simuPOP.Stat(alleleFreq=0, begin=0, step=other_params['Step']), 
 
             # Print allele frequencies, ".3f" refers to floating decimal point with three places, "\n" moves to the next line, \t adds a tab so that the file is tab delimited and easily readable in R
-            #simuPOP.PyOutput(r"Iteration:" + '\t' + str(Count) + "\t", step=other_params['Step'], 
-            #    output='>>%s.txt' % Filename),
-            #simuPOP.PyEval(r"'Generation:\t%.0f\t' % (gen)", step=other_params['Step'], 
-            #    output='>>%s.txt' % Filename),
-            #simuPOP.PyEval(r"'%.3f\t' % (alleleFreq[0][0])", step=other_params['Step'],
-            #    output='>>%s.txt' % Filename),
-            #simuPOP.PyEval(r"'%.3f\n' % (1 - (alleleFreq[0][0]))", step=other_params['Step'],
-            #    output='>>%s.txt' % Filename)
+            simuPOP.PyOutput(step=other_params['Step'], 
+                output='>%s.txt' % Allele_Freq_Filename),
+            simuPOP.PyEval(r"'Generation:\t%.0f\t' % (gen)", step=other_params['Step'], 
+                output='>%s.txt' % Allele_Freq_Filename),
+            simuPOP.PyEval(r"'%.3f\t' % (alleleFreq[0][0])", step=other_params['Step'],
+                output='>%s.txt' % Allele_Freq_Filename),
+            simuPOP.PyEval(r"'%.3f\n' % (1 - (alleleFreq[0][0]))", step=other_params['Step'],
+                output='>%s.txt' % Allele_Freq_Filename),
+            # Terminate the simulation if the allele frequency reaches 0
+            simuPOP.TerminateIf('len(alleleFreq[0]) == 1'),
+            simuPOP.TerminateIf('len(alleleFreq[0]) == 0')
         
         # ,
-        # ],
+        ],
 
         
         # Generations to run
