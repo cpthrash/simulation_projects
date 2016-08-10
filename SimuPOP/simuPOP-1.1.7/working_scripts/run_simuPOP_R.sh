@@ -27,12 +27,11 @@ lowerSelValue=$(echo "${base}" | cut -f 5 -d '-') # Extract the lower selection 
 
 upperSelValue=$(echo "${base}" | cut -f 6 -d '-')  # Extract the upper selection value from the filename
 
-# Take simOutfile and calculate summary statistics using msstats
-cat "${simOutfile}" | msstats > MSstats_${popSize}_${generations}_${stablePeriod}_${lowerSelValue}_${upperSelValue}.txt
-
 # Where is MSstats_outfile? (file containing summary statistics from MSstats)?
 MSstats_outfile=MSstats_${popSize}_${generations}_${stablePeriod}_${lowerSelValue}_${upperSelValue}.txt
 
+# Take simOutfile and calculate summary statistics using msstats
+cat "${simOutfile}" | msstats > "${MSstats_outfile}"
 
 # If no file exists at MSstats, exit with error
 if [[ ! -f "${MSstats_outfile}" ]]; then echo "Failed to find MSstats_outfile" >&2; exit 1; fi

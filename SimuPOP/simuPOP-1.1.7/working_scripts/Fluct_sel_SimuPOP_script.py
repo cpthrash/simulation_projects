@@ -16,19 +16,19 @@ import simuPOP.utils # Contains export function for exporting in MS format
 
 #Define parameters in a dictionary to be used in simulation
 params = {
-    'PopSize':100,
-    'Generations':100,
+    'PopSize':1000,
+    'Generations':100000,
     'Mutation':.001,
     'NumChrom':1,
     'NumLoci':1,
     'Ploidy':1,
     'Repetitions':10,
-    'Switches':50,
+    'Switches':10000,
     'LowerSelValue':1.0,  # Lower limit of selection coefficients
-    'UpperSelValue':1.05,  # Upper limit of seleciton coefficients
+    'UpperSelValue':1.01,  # Upper limit of seleciton coefficients
     'Selcoeff':'random',  # If 'random', selection coefficients will be drawn randomly from a uniform distribution
     'SelectionType':'RandomlyFluctuating', # 'Symmetrical'' for semi-symmetrical selection pressure.  'RandomlyFluctuating' for random selection pressure drawn from distribution
-    'SampleDivisions':100,
+    'SampleDivisions':5000,
     'PopList':[] # Create an empty list 
     
 }
@@ -171,16 +171,16 @@ def simuFluctuatingSelectionWF(params, other_params): # Define a simulation func
 
             # Print allele frequencies, ".3f" refers to floating decimal point with three places, "\n" moves to the next line, \t adds a tab so that the file is tab delimited and easily readable in R
             simuPOP.PyOutput(step=other_params['Step'], 
-                output='>%s.txt' % Allele_Freq_Filename),
+                output='>>>%s.txt' % Allele_Freq_Filename),
             simuPOP.PyEval(r"'Generation:\t%.0f\t' % (gen)", step=other_params['Step'], 
-                output='>%s.txt' % Allele_Freq_Filename),
+                output='>>>%s.txt' % Allele_Freq_Filename),
             simuPOP.PyEval(r"'%.3f\t' % (alleleFreq[0][0])", step=other_params['Step'],
-                output='>%s.txt' % Allele_Freq_Filename),
+                output='>>>%s.txt' % Allele_Freq_Filename),
             simuPOP.PyEval(r"'%.3f\n' % (1 - (alleleFreq[0][0]))", step=other_params['Step'],
-                output='>%s.txt' % Allele_Freq_Filename),
+                output='>>>%s.txt' % Allele_Freq_Filename),
             # Terminate the simulation if the allele frequency reaches 0
-            simuPOP.TerminateIf('len(alleleFreq[0]) == 1'),
-            simuPOP.TerminateIf('len(alleleFreq[0]) == 0')
+           # simuPOP.TerminateIf('len(alleleFreq[0]) == 1'),
+           # simuPOP.TerminateIf('len(alleleFreq[0]) == 0')
         
         # ,
         ],
@@ -191,9 +191,9 @@ def simuFluctuatingSelectionWF(params, other_params): # Define a simulation func
     )
 
 
-    simuPOP.utils.export(pop, format='ms', output=('MS-%s.txt' % Filename), gui=False, splitBy='subPop') # Export the data in MS format
+    simuPOP.utils.export(pop, format='ms', output=('/panfs/roc/groups/9/morrellp/pier0273/simulation_projects_MSI/scripts/MS-%s.txt' % Filename), gui=False, splitBy='subPop') # Export the data in MS format
 
-    print(open('MS-%s.txt' % Filename).read())  # 
+    print(open('/panfs/roc/groups/9/morrellp/pier0273/simulation_projects_MSI/scripts/MS-%s.txt' % Filename).read())  # 
     
     #print(open('%s.txt' % Filename).read())  # Open the output file and print to it
 
