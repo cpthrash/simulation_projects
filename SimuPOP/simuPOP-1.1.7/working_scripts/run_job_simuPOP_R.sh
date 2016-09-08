@@ -1,15 +1,14 @@
 #!/bin/sh 
 
-#PBS -l walltime=12:00:00,nodes=1:ppn=8,pmem=20gb
+#PBS -l walltime=50:00:00,nodes=1:ppn=8,pmem=2500mb
 #PBS -m abe
 #PBS -M pier0273@umn.edu
-#PBS -q lab
+#PBS -q mesabi
 #PBS -e /panfs/roc/groups/9/morrellp/pier0273/simulation_projects_MSI/scripts/e_o_files
 #PBS -o pipefail /panfs/roc/groups/9/morrellp/pier0273/simulation_projects_MSI/scripts/e_o_files
 #PBS -u pier0273
+#PBS -N sel_coeff=1.50
 
-# echo $(pwd -P)
-# exit -8
 
 #This shell script calls on a Python script that simulates fluctuating selection in a haploid population, and redirects the output to an Rscript for plotting and printing of a PDF file.  It also directs the printed pdf file to a specific directory
 
